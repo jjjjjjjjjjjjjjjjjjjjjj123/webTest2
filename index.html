@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background-image: url('brownBack.png'); background-size: cover; background-repeat: repeat-y;">
+</body>
+
+    <input class="card" type="text" id="wsUrl" placeholder="Enter WebSocket URL" />
+    <button class="card" id="connectBtn" onclick="connectWebSocket()" disabled >Connect</button>
+    <p id="status">Not Connected</p>
+
+    <input class="card" type="text" id="nameInput" placeholder="Enter name here">
+
+
+    <script src="recieve.js"></script>  <!-- Must load before script.js -->
+    <script src="connect.js"></script>
+    <script src="buttonMaker.js"></script>
+    <script src="webStyles.js"></script>
+
+    <script>
+        var socket;
+
+        function connectWebSocket() {
+        // Extract ws parameter from URL
+        const params = new URLSearchParams(window.location.search);
+        var wsPart = params.get('ws');
+
+        if (!wsPart) {
+            // fallback: get it from input box as before
+            wsPart = document.getElementById("wsUrl").value.trim();
+        }
+
+        socket = new WebSocket("wss://" + wsPart + "/game");
+
+        socket.onopen = () => handleSocketOpen(socket, wsPart, document.getElementById("nameInput").value);
+        socket.onmessage = handleSocketMessage;
+        socket.onclose = () => handleSocketClose();
+        socket.onerror = (error) => handleSocketError(error);
+
+        clearButtons();
+    }
+
+
+
+        function clearButtons()
+        {
+            document.getElementById("nameInput").style.display = "none";
+            document.getElementById("wsUrl").style.display = "none";
+            document.getElementById("connectBtn").style.display = "none";
+        }
+
+        function sendPlayerAction(action) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: "action", action }));
+            } else {
+                alert("WebSocket not connected!");
+            }
+        }
+
+        window.onload = () => {
+            connectWebSocket();
+        };
+
+    </script>
+</body>
+</html>

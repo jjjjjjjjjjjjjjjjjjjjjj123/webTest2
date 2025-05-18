@@ -1,0 +1,48 @@
+.card {
+    background-image: url('cardBig.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 296px;  /* Adjust width of the button */
+    height: 128px;  /* Adjust height of the button */
+    border: none;
+    background-color: transparent;
+    image-rendering: crisp-edges; /* Keeps sharp edges */
+    image-rendering: pixelated; /* Best for pixel art */
+
+    text-align: center;
+    font-size: x-large;
+
+    
+}
+
+button:active {
+    filter: brightness(75%);
+    background-color: deepskyblue;
+    transform: scale(0.90);
+}
+
+#nameInput {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#wsUrl {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#connectBtn {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    filter: brightness(50%);
+}
+
+.darken {
+    filter: brightness(50%);
+}
