@@ -7,63 +7,69 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body style="background-image: url('brownBack.png'); background-size: cover; background-repeat: repeat-y;">
-</body>
 
-    <button class="card" id="connectBtn" onclick="connectWebSocket()" disabled >Connect</button>
+    <!-- This input is hidden by default unless ?ws is missing -->
+    <input class="card" type="text" id="wsUrl" placeholder="Enter WebSocket URL" style="display: none;" />
+    
+    <!-- Name input stays visible -->
+    <input class="card" type="text" id="nameInput" placeholder="Enter name here">
+    
+    <!-- Connect button is renamed for clarity -->
+    <button class="card" id="connectBtn" onclick="connectWebSocket()">Confirm</button>
+
     <p id="status">Not Connected</p>
 
-    <input class="card" type="text" id="nameInput" placeholder="Enter name here">
-
-
-    <script src="recieve.js"></script>  <!-- Must load before script.js -->
+    <script src="recieve.js"></script>
     <script src="connect.js"></script>
     <script src="buttonMaker.js"></script>
     <script src="webStyles.js"></script>
 
     <script>
-        var socket;
+        let socket;
 
         function connectWebSocket() {
-        // Extract ws parameter from URL
-        const params = new URLSearchParams(window.location.search);
-        var wsPart = params.get('ws');
+            const params = new URLSearchParams(window.location.search);
+            let wsPart = params.get('ws');
 
-        if (!wsPart) {
-            // fallback: get it from input box as before
-            wsPart = document.getElementById("wsUrl").value.trim();
-        }
+            // If not in URL, show input and use that
+            if (!wsPart) {
+                wsPart = document.getElementById("wsUrl").value.trim();
+            }
 
-        socket = new WebSocket("wss://" + wsPart + "/game");
+            if (!wsPart) {
+                alert("WebSocket URL missing!");
+                return;
+            }
 
-        socket.onopen = () => handleSocketOpen(socket, wsPart, document.getElementById("nameInput").value);
-        socket.onmessage = handleSocketMessage;
-        socket.onclose = () => handleSocketClose();
-        socket.onerror = (error) => handleSocketError(error);
+            const name = document.getElementById("nameInput").value.trim();
+            if (!name) {
+                alert("Please enter a name.");
+                return;
+            }
 
-        clearButtons();
-    }
+            socket = new WebSocket("wss://" + wsPart + "/game");
 
+            socket.onopen = () => handleSocketOpen(socket, wsPart, name);
+            socket.onmessage = handleSocketMessage;
+            socket.onclose = handleSocketClose;
+            socket.onerror = handleSocketError;
 
-
-        function clearButtons()
-        {
+            // Hide inputs
             document.getElementById("nameInput").style.display = "none";
             document.getElementById("wsUrl").style.display = "none";
             document.getElementById("connectBtn").style.display = "none";
         }
 
-        function sendPlayerAction(action) {
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                socket.send(JSON.stringify({ type: "action", action }));
-            } else {
-                alert("WebSocket not connected!");
-            }
-        }
-
         window.onload = () => {
-            connectWebSocket();
-        };
+            const params = new URLSearchParams(window.location.search);
+            const wsParamExists = params.get('ws');
 
+            if (!wsParamExists) {
+                // No URL param? Show input to manually enter WebSocket URL
+                document.getElementById("wsUrl").style.display = "inline-block";
+            }
+        };
     </script>
+
 </body>
 </html>
