@@ -46,3 +46,29 @@ button:active {
 .darken {
     filter: brightness(50%);
 }
+
+/* Center container horizontally */
+.center-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Control vertical position independently */
+.input-wrapper {
+    margin-top: 300px; /* Adjust this value to control vertical position of input */
+    display: flex;
+    justify-content: center;
+}
+
+.button-wrapper {
+    margin-top: 20px; /* Adjust this to move the button up or down */
+    display: flex;
+    justify-content: center;
+}
+
+/* Disabled button style */
+#confirmBtn:disabled {
+    filter: brightness(50%);
+    cursor: not-allowed;
+}
