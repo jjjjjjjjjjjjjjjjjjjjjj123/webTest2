@@ -8,13 +8,11 @@
 </head>
 <body style="background-image: url('brownBack.png'); background-size: cover; background-repeat: repeat-y;">
 
-    <!-- This input is hidden by default unless ?ws is missing -->
+    <!-- Hidden WebSocket URL input (used only as fallback, never shown) -->
     <input class="card" type="text" id="wsUrl" placeholder="Enter WebSocket URL" style="display: none;" />
-    
-    <!-- Name input stays visible -->
+
+    <!-- Visible name input and confirm button -->
     <input class="card" type="text" id="nameInput" placeholder="Enter name here">
-    
-    <!-- Connect button is renamed for clarity -->
     <button class="card" id="connectBtn" onclick="connectWebSocket()">Confirm</button>
 
     <p id="status">Not Connected</p>
@@ -31,7 +29,7 @@
             const params = new URLSearchParams(window.location.search);
             let wsPart = params.get('ws');
 
-            // If not in URL, show input and use that
+            // If no ?ws= param, fallback to the hidden input (for testing/debug)
             if (!wsPart) {
                 wsPart = document.getElementById("wsUrl").value.trim();
             }
@@ -54,21 +52,10 @@
             socket.onclose = handleSocketClose;
             socket.onerror = handleSocketError;
 
-            // Hide inputs
+            // Hide inputs after connecting
             document.getElementById("nameInput").style.display = "none";
-            document.getElementById("wsUrl").style.display = "none";
             document.getElementById("connectBtn").style.display = "none";
         }
-
-        window.onload = () => {
-            const params = new URLSearchParams(window.location.search);
-            const wsParamExists = params.get('ws');
-
-            if (!wsParamExists) {
-                // No URL param? Show input to manually enter WebSocket URL
-                document.getElementById("wsUrl").style.display = "inline-block";
-            }
-        };
     </script>
 
 </body>
