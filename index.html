@@ -7,56 +7,64 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body style="background-image: url('brownBack.png'); background-size: cover; background-repeat: repeat-y;">
+</body>
 
-    <!-- Hidden WebSocket URL input (used only as fallback, never shown) -->
-    <input class="card" type="text" id="wsUrl" placeholder="Enter WebSocket URL" style="display: none;" />
-
-    <!-- Visible name input and confirm button -->
-    <input class="card" type="text" id="nameInput" placeholder="Enter name here">
-    <button class="card" id="connectBtn" onclick="connectWebSocket()">Confirm</button>
-
+    
+    <button class="card" id="connectBtn" onclick="connectWebSocket()" disabled >Connect</button>
     <p id="status">Not Connected</p>
 
-    <script src="recieve.js"></script>
+    <input class="card" type="text" id="nameInput" placeholder="Enter name here">
+
+
+    <script src="recieve.js"></script>  <!-- Must load before script.js -->
     <script src="connect.js"></script>
     <script src="buttonMaker.js"></script>
     <script src="webStyles.js"></script>
 
     <script>
-        let socket;
+        var socket;
 
         function connectWebSocket() {
-            const params = new URLSearchParams(window.location.search);
-            let wsPart = params.get('ws');
+        // Extract ws parameter from URL
+        const params = new URLSearchParams(window.location.search);
+        var wsPart = params.get('ws');
 
-            // If no ?ws= param, fallback to the hidden input (for testing/debug)
-            if (!wsPart) {
-                wsPart = document.getElementById("wsUrl").value.trim();
-            }
+        if (!wsPart) {
+            // fallback: get it from input box as before
+            wsPart = document.getElementById("wsUrl").value.trim();
+        }
 
-            if (!wsPart) {
-                alert("WebSocket URL missing!");
-                return;
-            }
+        socket = new WebSocket("wss://" + wsPart + "/game");
 
-            const name = document.getElementById("nameInput").value.trim();
-            if (!name) {
-                alert("Please enter a name.");
-                return;
-            }
+        socket.onopen = () => handleSocketOpen(socket, wsPart, document.getElementById("nameInput").value);
+        socket.onmessage = handleSocketMessage;
+        socket.onclose = () => handleSocketClose();
+        socket.onerror = (error) => handleSocketError(error);
 
-            socket = new WebSocket("wss://" + wsPart + "/game");
+        clearButtons();
+    }
 
-            socket.onopen = () => handleSocketOpen(socket, wsPart, name);
-            socket.onmessage = handleSocketMessage;
-            socket.onclose = handleSocketClose;
-            socket.onerror = handleSocketError;
 
-            // Hide inputs after connecting
+
+        function clearButtons()
+        {
             document.getElementById("nameInput").style.display = "none";
+            document.getElementById("wsUrl").style.display = "none";
             document.getElementById("connectBtn").style.display = "none";
         }
-    </script>
 
+        function sendPlayerAction(action) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: "action", action }));
+            } else {
+                alert("WebSocket not connected!");
+            }
+        }
+
+        //window.onload = () => {
+            //connectWebSocket();
+        //};
+
+    </script>
 </body>
 </html>
