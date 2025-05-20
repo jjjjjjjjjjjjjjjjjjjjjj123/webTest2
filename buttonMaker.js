@@ -9,7 +9,7 @@ function getHeaderHeight() {
 function positionButtons() {
     const headerHeight = getHeaderHeight();
     allButtons.forEach(({ button, originalY }) => {
-        button.style.top = headerHeight + originalY + "px";
+        button.style.top = headerHeight + 20 + originalY + "px";
     });
 }
 
