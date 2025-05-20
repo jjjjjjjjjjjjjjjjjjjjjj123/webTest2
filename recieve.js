@@ -32,6 +32,8 @@ function handleSocketMessage(event) {
 
         }  else if (data.type === "wipe") {
             if ((data.playerId === index)||data.playerId === 99){//valid player id
+                
+                waitForWipe = false; // Allow button presses again
                 // Remove all buttons
                 const buttons = document.querySelectorAll("button");
                 buttons.forEach(button => {

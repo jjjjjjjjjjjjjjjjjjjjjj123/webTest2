@@ -1,5 +1,6 @@
 // Keep track of all buttons created
 const allButtons = [];
+let waitForWipe = false;
 
 function getHeaderHeight() {
     const headerContainer = document.getElementById("header-container");
@@ -32,6 +33,9 @@ function createButton(name, index, width, height, posX, posY, role, playerId, co
     positionButtons();
 
     button.onclick = function () {
+        if (waitForWipe) return; // Do nothing if we're waiting for a wipe
+        waitForWipe = true; // Lock further button presses
+
         socket.send(JSON.stringify({ type: "button", index: index, role: role, playerId: playerId }));
     };
 }
