@@ -49,7 +49,7 @@ function handleSocketMessage(event) {
 
         } else if (data.type === "index"){
             if (index===99){
-                index = data.index;
+                index = data.playerId;
             }
         } else {
             console.warn("Invalid message format:", data);
