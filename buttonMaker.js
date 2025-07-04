@@ -1,6 +1,5 @@
 // Keep track of all buttons created
 const allButtons = [];
-let waitForWipe = false;
 
 function getHeaderHeight() {
     const headerContainer = document.getElementById("header-container");
@@ -15,8 +14,38 @@ function positionButtons() {
 }
 
 function createButton(name, index, width, height, posX, posY, role, playerId, color) {
-    const button = document.createElement("button");
-    button.innerText = name;
+    let button;
+
+    if (role === "textInput") {
+        button = document.createElement("input");
+        button.type = "text";
+        button.placeholder = name;
+    } else {
+        button = document.createElement("button");
+        button.innerText = name;
+        button.onclick = function () {
+            if (role === "textSend") {
+                // Find all inputs with role textInput and get their values concatenated (or first one)
+                const textInputs = allButtons
+                    .filter(b => b.button.tagName === "INPUT" && b.button.type === "text")
+                    .map(b => b.button.value.trim())
+                    .filter(val => val.length > 0);
+
+                // For simplicity, join all values by comma if multiple inputs (can be changed if needed)
+                const textValue = textInputs.join(",") || "";
+
+                socket.send(JSON.stringify({ 
+                    type: "button", 
+                    index: index, 
+                    role: role + (textValue ? "/" + textValue : ""), 
+                    playerId: playerId 
+                }));
+            } else {
+                socket.send(JSON.stringify({ type: "button", index: index, role: role, playerId: playerId }));
+            }
+        };
+    }
+
     button.classList.add("card");
     if (color === "gray") button.classList.add("darken");
 
@@ -31,13 +60,6 @@ function createButton(name, index, width, height, posX, posY, role, playerId, co
 
     // Reposition all buttons in case header is present
     positionButtons();
-
-    button.onclick = function () {
-        if (waitForWipe) return; // Do nothing if we're waiting for a wipe
-        waitForWipe = true; // Lock further button presses
-
-        socket.send(JSON.stringify({ type: "button", index: index, role: role, playerId: playerId }));
-    };
 }
 
 function makeHeader(text, playerId) {
