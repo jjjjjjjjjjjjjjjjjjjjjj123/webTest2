@@ -34,6 +34,12 @@ function createButton(name, index, width, height, posX, posY, role, playerId, co
                 // For simplicity, join all values by comma if multiple inputs (can be changed if needed)
                 const textValue = textInputs.join(",") || "";
 
+                allButtons.forEach(b => {
+                    if (b.button.tagName === "INPUT" && b.button.type === "text") {
+                        b.button.value = ""; // Clear the text input
+                    }
+                });
+
                 socket.send(JSON.stringify({ 
                     type: "button", 
                     index: index, 
