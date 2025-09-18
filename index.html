@@ -41,7 +41,7 @@
                 return;
             }
 
-            const fullUrl = "wss://" + wsPart + "/game";
+            const fullUrl = "wss://" + wsPart;
             socket = new WebSocket(fullUrl);
 
             socket.onopen = () => handleSocketOpen(socket, wsPart, name);
@@ -74,3 +74,4 @@
     </script>
 </body>
 </html>
+
