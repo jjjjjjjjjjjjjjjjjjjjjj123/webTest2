@@ -22,21 +22,47 @@ function createButton(name, index, width, height, posX, posY, role, playerId, co
         button.placeholder = name;
     } else {
         button = document.createElement("button");
-        button.innerText = name;
+
+        // Clear previous content
+        button.innerHTML = "";
+
+        // Parse the name for color codes in the format: {color|text}
+        // Example: "Click {#FF0000|Here}!"
+        const regex = /\{(#?\w+)\|([^}]+)\}/g;
+        let lastIndex = 0;
+        let match;
+        while ((match = regex.exec(name)) !== null) {
+            // Add text before the match
+            if (match.index > lastIndex) {
+                button.appendChild(document.createTextNode(name.substring(lastIndex, match.index)));
+            }
+
+            // Add colored text
+            const span = document.createElement('span');
+            span.textContent = match[2];
+            span.style.color = match[1];
+            button.appendChild(span);
+
+            lastIndex = regex.lastIndex;
+        }
+
+        // Add any remaining text after the last match
+        if (lastIndex < name.length) {
+            button.appendChild(document.createTextNode(name.substring(lastIndex)));
+        }
+
         button.onclick = function () {
             if (role === "textSend") {
-                // Find all inputs with role textInput and get their values concatenated (or first one)
                 const textInputs = allButtons
                     .filter(b => b.button.tagName === "INPUT" && b.button.type === "text")
                     .map(b => b.button.value.trim())
                     .filter(val => val.length > 0);
 
-                // For simplicity, join all values by comma if multiple inputs (can be changed if needed)
                 const textValue = textInputs.join(",") || "";
 
                 allButtons.forEach(b => {
                     if (b.button.tagName === "INPUT" && b.button.type === "text") {
-                        b.button.value = ""; // Clear the text input
+                        b.button.value = ""; // Clear input
                     }
                 });
 
@@ -61,12 +87,11 @@ function createButton(name, index, width, height, posX, posY, role, playerId, co
 
     document.body.appendChild(button);
 
-    // Track the button and its original Y offset
     allButtons.push({ button: button, originalY: posY });
 
-    // Reposition all buttons in case header is present
     positionButtons();
 }
+
 
 function makeHeader(text, playerId) {
     let headerContainer = document.getElementById("header-container");
@@ -81,13 +106,39 @@ function makeHeader(text, playerId) {
     }
 
     const header = document.createElement('h1');
-    header.textContent = text;
     header.style.margin = "0";
+
+    // Parse the text for color codes in the format: {color|text}
+    // Example: "Hello {red|World}!"
+    const regex = /\{(\w+)\|([^}]+)\}/g;
+    let lastIndex = 0;
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+        // Add text before the match
+        if (match.index > lastIndex) {
+            header.appendChild(document.createTextNode(text.substring(lastIndex, match.index)));
+        }
+
+        // Add colored text
+        const span = document.createElement('span');
+        span.textContent = match[2];
+        span.style.color = match[1];
+        header.appendChild(span);
+
+        lastIndex = regex.lastIndex;
+    }
+
+    // Add any remaining text after the last match
+    if (lastIndex < text.length) {
+        header.appendChild(document.createTextNode(text.substring(lastIndex)));
+    }
+
     headerContainer.appendChild(header);
 
     // Wait for DOM to update and remeasure header height
     setTimeout(positionButtons, 0);
 }
+
 
 // Optional: update button positions if window is resized (responsive design)
 window.addEventListener("resize", () => {
