@@ -110,7 +110,7 @@ function makeHeader(text, playerId) {
 
     // Parse the text for color codes in the format: {color|text}
     // Example: "Hello {red|World}!"
-    const regex = /\{(\w+)\|([^}]+)\}/g;
+    const regex = /\{(#?\w+)\|([^}]+)\}/g;
     let lastIndex = 0;
     let match;
     while ((match = regex.exec(text)) !== null) {
